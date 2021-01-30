@@ -18,7 +18,7 @@ public class WordLengths {
             if (!Character.isLetter(word.charAt(word.length()-1))) {
                 idx --;
             }
-            counts[Math.min(idx,counts.length-1)]++;
+            counts[Math.max(0,Math.min(idx,counts.length-1))]++;
         }
     }
     
