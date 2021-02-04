@@ -49,9 +49,6 @@ public class GladLibMap {
     }
     
     private String getSubstitute(String label) {
-        if (!usedLabels.contains(label)) {
-            usedLabels.add(label);
-        }
         if (myMap.containsKey(label)) {
             ArrayList<String> words = myMap.get(label);
             return randomFrom(words);
@@ -70,9 +67,13 @@ public class GladLibMap {
         }
         String prefix = w.substring(0,first);
         String suffix = w.substring(last+1);
-        String sub = getSubstitute(w.substring(first+1,last));
+        String label = w.substring(first+1,last);
+        if (!usedLabels.contains(label)) {
+            usedLabels.add(label);
+        }
+        String sub = getSubstitute(label);
         while (usedWords.contains(sub)) {                        //possible infinite loop!
-            sub = getSubstitute(w.substring(first+1,last));
+            sub = getSubstitute(label);
         }
         usedWords.add(sub);
         return prefix+sub+suffix;
