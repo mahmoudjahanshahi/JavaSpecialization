@@ -58,4 +58,26 @@ public class Tester {
         System.out.println("\nTesting encrypt and decrypt methods");
         System.out.println("The encrypted text is:\n"+encrypted+"\nand it was originally:\n"+decrypted);
     }
+    
+    public void testVigenereBreaker() {
+        System.out.println("Testing Vigenere Breaker");
+        String text = "abcdefghijklm";
+        VigenereBreaker vb = new VigenereBreaker();
+        System.out.println("\nTesting sliceString method with string: \t"+text);
+        for (int i = 3; i < 6; i++) {
+            for (int j = 0; j < i; j++) {
+                System.out.println("sliceString(string, "+j+", "+i+"):\t"+vb.sliceString(text, j, i));
+            }
+        }
+        
+        String filename = "athens_keyflute.txt";
+        FileResource fr = new FileResource("./data/TestData/"+filename);
+        String encrypted = fr.asString();
+        int[] key = vb.tryKeyLength(encrypted, 5, 'e');
+        VigenereCipher vc = new VigenereCipher(key);
+        System.out.println("\nTesting tryKeyLength method ("+filename+")\n"+vc);
+        
+        System.out.println("\nTesting breakVigenere method");
+        vb.breakVigenere();
+    }
 }
