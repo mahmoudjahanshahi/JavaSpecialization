@@ -77,7 +77,7 @@ public class Tester {
         VigenereCipher vc = new VigenereCipher(key);
         System.out.println("\nTesting tryKeyLength method ("+filename+")\n"+vc);
         
-        System.out.println("\nTesting breakVigenere method");
+        System.out.println("\nTesting breakVigenere method\n");
         vb.breakVigenere();
     }
 }
