@@ -1,6 +1,7 @@
 package module4;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import de.fhpotsdam.unfolding.UnfoldingMap;
@@ -20,7 +21,7 @@ import processing.core.PApplet;
 /** EarthquakeCityMap
  * An application with an interactive map displaying earthquake data.
  * Author: UC San Diego Intermediate Software Development MOOC team
- * @author Your name here
+ * @author mahmoudjs14 (03/13/2021)
  * Date: July 17, 2015
  * */
 public class EarthquakeCityMap extends PApplet {
@@ -39,8 +40,6 @@ public class EarthquakeCityMap extends PApplet {
 	
 	/** This is where to find the local tiles, for working without an Internet connection */
 	public static String mbTilesString = "blankLight-1-3.mbtiles";
-	
-	
 
 	//feed with magnitude 2.5+ Earthquakes
 	private String earthquakesURL = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.atom";
@@ -126,7 +125,6 @@ public class EarthquakeCityMap extends PApplet {
 		background(0);
 		map.draw();
 		addKey();
-		
 	}
 	
 	// helper method to draw key in GUI
@@ -137,31 +135,43 @@ public class EarthquakeCityMap extends PApplet {
 		rect(25, 50, 150, 250);
 		
 		fill(0);
-		textAlign(LEFT, CENTER);
+		textAlign(CENTER, CENTER);
+		textSize(16);
+		text("Earthquake Key", 100, 75);
 		textSize(12);
-		text("Earthquake Key", 50, 75);
+		text("Size ~ Magnitude", 100, 180);
+		textAlign(LEFT, CENTER);
+		text("City Marker", 75, 110);
+		text("Land Quake", 75, 130);
+		text("Ocean Quake", 75, 150);
+		text("Shallow", 75, 210);
+		text("Intermediate", 75, 230);
+		text("Deep", 75, 250);
+		text("Past Day", 75, 280);
 		
-		fill(color(255, 0, 0));
-		ellipse(50, 125, 15, 15);
-		fill(color(255, 255, 0));
-		ellipse(50, 175, 10, 10);
-		fill(color(0, 0, 255));
-		ellipse(50, 225, 5, 5);
+		fill(120,0,50);
+		triangle(50-5, 110+5, 50, 110-5, 50+5, 110+5);
+		noFill();
+		ellipse(50, 130, 10, 10);
+		rect(50-5, 150-5, 10, 10);
 		
-		fill(0, 0, 0);
-		text("5.0+ Magnitude", 75, 125);
-		text("4.0+ Magnitude", 75, 175);
-		text("Below 4.0", 75, 225);
+		fill(0, 0, 255);
+		ellipse(50, 210, 10, 10);
+		fill(255, 255, 0);
+		ellipse(50, 230, 10, 10);
+		fill(255, 0, 0);
+		ellipse(50, 250, 10, 10);
+		
+		line(50-6, 280-6, 50+6,280+6);
+		line(50+6, 280-6, 50-6,280+6);
+		
 	}
 
-	
-	
 	// Checks whether this quake occurred on land.  If it did, it sets the 
 	// "country" property of its PointFeature to the country where it occurred
 	// and returns true.  Notice that the helper method isInCountry will
 	// set this "country" property already.  Otherwise it returns false.
 	private boolean isLand(PointFeature earthquake) {
-		
 		
 		// Loop over all the country markers.  
 		// For each, check if the earthquake PointFeature is in the 
@@ -170,10 +180,10 @@ public class EarthquakeCityMap extends PApplet {
 		// If isInCountry ever returns true, isLand should return true.
 		for (Marker m : countryMarkers) {
 			// TODO: Finish this method using the helper method isInCountry
-			
+			if (isInCountry(earthquake, m)) {
+				return true;
+			}
 		}
-		
-		
 		// not inside any country
 		return false;
 	}
@@ -211,7 +221,37 @@ public class EarthquakeCityMap extends PApplet {
 		//      property set.  You can get the country with:
 		//        String country = (String)m.getProperty("country");
 		
+		//Building a HashMap of counts to be printed
+		HashMap<String,Integer> counts = new HashMap<String,Integer>();
+		int oceanCount = 0;
+		for (Marker m : quakeMarkers) 
+		{
+			EarthquakeMarker em = (EarthquakeMarker)m;
+			if (em.isOnLand()) 
+			{
+				LandQuakeMarker lm = (LandQuakeMarker)em;
+				String country = lm.getCountry();
+				if (counts.containsKey(country)) 
+				{
+					counts.put(country, counts.get(country)+1);
+				}
+				else 
+				{
+					counts.put(country, 1);
+				}
+			}
+			else 
+			{
+				oceanCount ++;
+			}
+		}
 		
+		//Printing the HashMap
+		for (String s : counts.keySet()) 
+		{
+			System.out.println(s + ": " + counts.get(s));
+		}
+		System.out.println("Oceans: " + oceanCount);
 	}
 	
 	
