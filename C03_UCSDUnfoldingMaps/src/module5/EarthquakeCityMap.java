@@ -20,7 +20,7 @@ import processing.core.PApplet;
 /** EarthquakeCityMap
  * An application with an interactive map displaying earthquake data.
  * Author: UC San Diego Intermediate Software Development MOOC team
- * @author Your name here
+ * @author mahmoudjs14 (03/18/2021)
  * Date: July 17, 2015
  * */
 public class EarthquakeCityMap extends PApplet {
@@ -146,6 +146,19 @@ public class EarthquakeCityMap extends PApplet {
 	private void selectMarkerIfHover(List<Marker> markers)
 	{
 		// TODO: Implement this method
+		if (lastSelected == null) 
+		{
+			for (Marker m : markers) 
+			{
+				CommonMarker marker = (CommonMarker)m;
+				if (marker.isInside(map, mouseX, mouseY)) 
+				{
+					lastSelected = marker;
+					marker.setSelected(true);
+					return;
+				}
+			}
+		}
 	}
 	
 	/** The event handler for mouse clicks
@@ -159,18 +172,107 @@ public class EarthquakeCityMap extends PApplet {
 		// TODO: Implement this method
 		// Hint: You probably want a helper method or two to keep this code
 		// from getting too long/disorganized
+		if (lastClicked == null) 
+		{
+			checkQuakesClick();
+			if (lastClicked == null) 
+			{
+				checkCitiesClick();
+			}
+		}
+		else
+		{
+			unhideMarkers();
+			lastClicked = null;
+		}
 	}
 	
-	
 	// loop over and unhide all markers
-	private void unhideMarkers() {
-		for(Marker marker : quakeMarkers) {
+	private void unhideMarkers() 
+	{
+		for(Marker marker : quakeMarkers) 
+		{
 			marker.setHidden(false);
 		}
 			
-		for(Marker marker : cityMarkers) {
+		for(Marker marker : cityMarkers) 
+		{
 			marker.setHidden(false);
 		}
+	}
+	
+	// Helper method to check if an earthquake marker was clicked
+	private void checkQuakesClick()
+	{
+		if (lastClicked != null) 
+		{
+			return;
+		}
+		for (Marker m : quakeMarkers) 
+		{
+			EarthquakeMarker marker = (EarthquakeMarker)m;
+			if 
+			(
+				!marker.isHidden() 
+				&& 
+				marker.isInside(map, mouseX, mouseY)
+			) 
+			{
+				lastClicked = marker;
+				for (Marker mhide : quakeMarkers) 
+				{
+					if (mhide != lastClicked) 
+					{
+						mhide.setHidden(true);
+					}
+				}
+				for (Marker mhide : cityMarkers) 
+				{
+					if (mhide.getDistanceTo(marker.getLocation()) > marker.threatCircle()) 
+					{
+						mhide.setHidden(true);
+					}
+				}
+				return;
+			}
+		}
+	}
+	
+	// Helper method to check if an city marker was clicked
+	private void checkCitiesClick()
+	{
+		if (lastClicked != null) 
+		{
+			return;
+		}
+		for (Marker marker : cityMarkers) 
+		{
+			if 
+			(
+				!marker.isHidden() 
+				&& 
+				marker.isInside(map, mouseX, mouseY)
+			) 
+			{
+				lastClicked = (CommonMarker)marker;
+				for (Marker mhide : cityMarkers) 
+				{
+					if (mhide != lastClicked) 
+					{
+						mhide.setHidden(true);
+					}
+				}
+				for (Marker mhide : quakeMarkers) 
+				{
+					EarthquakeMarker quakeMarker = (EarthquakeMarker)mhide;
+					if (quakeMarker.getDistanceTo(marker.getLocation()) > quakeMarker.threatCircle()) 
+					{
+						quakeMarker.setHidden(true);
+					}
+				}
+				return;
+			}
+		}		
 	}
 	
 	// helper method to draw key in GUI
